@@ -1,4 +1,4 @@
-package thoughtworks.learnspring
+package thoughtworks.main
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
