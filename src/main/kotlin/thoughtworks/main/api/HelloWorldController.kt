@@ -6,7 +6,11 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class HelloWorldController {
     @GetMapping("/health")
-    fun healthy(): String {
-        return "Healthy"
+    fun healthy(): Status {
+        return Status("Healthy")
     }
 }
+
+data class Status(
+    val status: String
+)

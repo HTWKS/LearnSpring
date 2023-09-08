@@ -1,13 +1,13 @@
-package thoughtworks.main.api
+package thoughtworks.unit.api
 
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
+import thoughtworks.main.api.HelloWorldController
+import thoughtworks.main.api.Status
 
-@SpringBootTest
 class HelloWorldControllerTests {
     @Test
     fun shouldReturnHealthy_WhenHealthyIsCalled() {
         val sut = HelloWorldController()
-        assert("Healthy" == sut.healthy())
+        assert(Status("Healthy") == sut.healthy())
     }
 }
