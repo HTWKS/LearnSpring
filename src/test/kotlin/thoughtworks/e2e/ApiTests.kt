@@ -9,7 +9,8 @@ class ApiTests {
     @Test
     fun shouldReturnHealthy_WhenHealthyEndPointIsCalled() {
         val restTemplate = RestTemplate()
-        val uri = URI("http://localhost:8080/health")
+        val uriString = System.getenv("WEB_HOST") ?: "http://localhost:8080"
+        val uri = URI("$uriString/health")
         val result = restTemplate.getForEntity(uri, StatusResponse::class.java)
         assert(result.body == StatusResponse("Healthy"))
     }

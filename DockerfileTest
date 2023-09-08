@@ -1,0 +1,9 @@
+FROM eclipse-temurin:17-jdk-jammy
+
+WORKDIR /docker-e2e-test
+
+COPY . .
+
+ENV WEB_HOST='http://web:8080'
+
+ENTRYPOINT ./src/scripts/run-e2e-tests.sh

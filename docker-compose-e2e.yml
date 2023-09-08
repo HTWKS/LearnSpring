@@ -1,0 +1,22 @@
+version: "3.7"
+services:
+  web:
+    container_name: web
+    build:
+      context: ./
+      dockerfile: DockerfileBuild
+    ports:
+      - "8080:8080"
+  e2e:
+    container_name: e2e
+    build:
+      context: ./
+      dockerfile: DockerfileTest
+    environment:
+      - WEB_HOST=http://web:8080
+    depends_on: ["web"]
+    entrypoint: ["./src/scripts/wait-for-it.sh", "-s", "web:8080", "--", "./src/scripts/run-e2e-tests.sh"]
+
+networks:
+  default:
+    name: learn-spring-network
