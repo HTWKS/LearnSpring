@@ -1,0 +1,27 @@
+{
+  "name": "learn-spring",
+  "version": "1.0.0",
+  "description": "Learn spring framework by practical project",
+  "main": "index.js",
+  "scripts": {
+    "prepare": "husky install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HTWKS/LearnSpring.git"
+  },
+  "keywords": [
+    "kotlin",
+    "spring",
+    "gradle"
+  ],
+  "author": "ThoughtWorks",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HTWKS/LearnSpring/issues"
+  },
+  "devDependencies": {
+    "husky": "^6.0.0"
+  },
+  "homepage": "https://github.com/HTWKS/LearnSpring#readme"
+}
