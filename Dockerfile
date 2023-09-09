@@ -18,7 +18,7 @@ COPY --from=app-artifact-cache /usr/src/java-code/build/libs/*.jar ./app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
 
 FROM gradle:8.2.1-jdk17 as run-e2e
-COPY --from=gradle-cache /home/gradle/cache_home /home/gradle/.gradle
-COPY . /usr/src/java-code/
+COPY --from=app-artifact-cache /home/gradle/.gradle /home/gradle/.gradle
+COPY --from=app-artifact-cache /usr/src/java-code/ /usr/src/java-code/
 WORKDIR /usr/src/java-code/
 ENTRYPOINT ./src/scripts/run-all-tests-docker.sh
