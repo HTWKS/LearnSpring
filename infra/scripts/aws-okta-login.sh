@@ -3,5 +3,5 @@
 set -euo pipefail
 
 BASEDIR=$(dirname "$0")
-. "${BASEDIR}"/constants.env
-aws sso login --profile AWS_PROFILE
+source "${BASEDIR}"/set-aws-environment.sh
+aws sso login --profile "${AWS_PROFILE}"
