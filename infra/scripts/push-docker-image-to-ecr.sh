@@ -10,7 +10,7 @@ apply_terraform_and_set_variables(){
 
 build_and_push_docker_image(){
   aws ecr-public get-login-password --region us-east-1 --profile "$AWS_PROFILE" | docker login --username AWS --password-stdin "$AWS_ECR_PUBLIC_URI"
-  docker build -t "${AWS_ECR_PUBLIC_NAME}" -f Dockerfile --target run-app .
+  docker build -t "$AWS_ECR_PUBLIC_NAME" -f Dockerfile --target run-app .
   docker tag "$AWS_ECR_PUBLIC_NAME":$BUILD_TAG "$AWS_ECR_PUBLIC_URI":$BUILD_TAG
   docker push "$AWS_ECR_PUBLIC_URI":$BUILD_TAG
 }

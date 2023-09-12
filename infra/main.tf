@@ -1,14 +1,52 @@
-data "aws_iam_role" "ecs_task_execution_role" {
+data "aws_subnet" "ap-southeast-1a" {
   provider = aws.ap-southeast-1
-  name     = "ecsTaskExecutionRole"
+  id       = var.subnet-id-24-ap-southeast-1a
+}
+
+resource "aws_security_group" "localhost-web-traffic-inbound" {
+  provider    = aws.ap-southeast-1
+  description = "Allow port 8080 for local host of spring"
+  egress      = []
+  ingress     = [
+    {
+      cidr_blocks = [
+        "0.0.0.0/0",
+      ]
+      description      = "Localhost Spring fw"
+      from_port        = 8080
+      ipv6_cidr_blocks = []
+      prefix_list_ids  = []
+      protocol         = "tcp"
+      security_groups  = []
+      self             = false
+      to_port          = 8080
+    },
+    {
+      cidr_blocks      = []
+      description      = "Localhost Spring fw"
+      from_port        = 8080
+      ipv6_cidr_blocks = [
+        "::/0",
+      ]
+      prefix_list_ids = []
+      protocol        = "tcp"
+      security_groups = []
+      self            = false
+      to_port         = 8080
+    },
+  ]
+  name   = "webLocal"
+  vpc_id = aws_default_vpc.my_vpc.id
+  revoke_rules_on_delete = false
 }
 
 resource "aws_default_vpc" "my_vpc" {
-  provider = aws.ap-southeast-1
-}
-
-resource "aws_default_security_group" "sec_group" {
-  provider = aws.ap-southeast-1
+  provider             = aws.ap-southeast-1
+  enable_dns_hostnames = false
+  force_destroy        = false
+  tags                 = {
+    "Name" = "my-vpc"
+  }
 }
 
 resource "aws_ecrpublic_repository" "ecr_repo" {
@@ -16,69 +54,22 @@ resource "aws_ecrpublic_repository" "ecr_repo" {
   repository_name = "docker_spring_demo"
 }
 
-resource "aws_ecs_cluster" "ecs_cluster" {
-  provider = aws.ap-southeast-1
-  name     = "spring-demo-cluster"
-}
-
-resource "aws_ecs_service" "web_ecs_service" {
-  name                  = "spring_demo_task"
-  provider              = aws.ap-southeast-1
-  desired_count         = 1
-  task_definition       = aws_ecs_task_definition.ecr_task.arn
-  wait_for_steady_state = "false"
-  deployment_circuit_breaker {
-    enable   = true
-    rollback = true
-  }
-}
-resource "aws_ecs_task_definition" "ecr_task" {
-  family   = "docker_spring_demo_task"
-  provider = aws.ap-southeast-1
-  runtime_platform {
-    cpu_architecture        = "ARM64"
-    operating_system_family = "LINUX"
-  }
-  cpu                      = "256"
-  memory                   = "512"
-  skip_destroy             = "false"
-  requires_compatibilities = [
-    "FARGATE"
-  ]
-  network_mode          = "awsvpc"
-  execution_role_arn    = data.aws_iam_role.ecs_task_execution_role.arn
-  container_definitions = jsonencode([
+resource "aws_iam_role" "aws_ecs_task_execution_role" {
+  provider           = aws.ap-southeast-1
+  name               = "ecsTaskExecutionRole"
+  assume_role_policy = jsonencode(
     {
-      cpu : 256,
-      environment : [],
-      environmentFiles : [],
-      essential : true,
-      image : aws_ecrpublic_repository.ecr_repo.repository_uri,
-      logConfiguration : {
-        logDriver : "awslogs",
-        options : {
-          "awslogs-create-group" : "true",
-          "awslogs-group" : "/ecs/docker_spring_demo_task",
-          "awslogs-region" : var.singapore-aws-provider,
-          "awslogs-stream-prefix" : "ecs"
-        },
-        secretOptions : []
-      },
-      memory : 512,
-      memoryReservation : 256,
-      mountPoints : [],
-      name : aws_ecrpublic_repository.ecr_repo.repository_name,
-      portMappings : [
+      Statement = [
         {
-          appProtocol : "http",
-          containerPort : 8080,
-          hostPort : 8080,
-          name : "docker_spring_demo-8080-tcp",
-          protocol : "tcp"
-        }
-      ],
-      ulimits : [],
-      volumesFrom : []
+          Action    = "sts:AssumeRole"
+          Effect    = "Allow"
+          Principal = {
+            Service = "ecs-tasks.amazonaws.com"
+          }
+          Sid = ""
+        },
+      ]
+      Version = "2008-10-17"
     }
-  ])
+  )
 }

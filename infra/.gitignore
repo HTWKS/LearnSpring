@@ -4,3 +4,4 @@
 
 # Local .terraform directories
 .terraform
+log
