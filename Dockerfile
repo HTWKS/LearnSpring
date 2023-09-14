@@ -15,7 +15,8 @@ FROM eclipse-temurin:17-jdk as run-app
 USER root
 WORKDIR /usr/src/java-app
 COPY --from=app-artifact-cache /usr/src/java-code/build/libs/*.jar ./app.jar
-ENTRYPOINT ["java", "-jar", "app.jar"]
+COPY --from=app-artifact-cache /usr/src/java-code/src/scripts/start-server-docker.sh ./entry-point.sh
+ENTRYPOINT ./entry-point.sh
 
 FROM gradle:8.2.1-jdk17 as run-e2e
 COPY --from=app-artifact-cache /home/gradle/.gradle /home/gradle/.gradle

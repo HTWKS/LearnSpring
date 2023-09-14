@@ -6,8 +6,10 @@ services:
       context: .
       dockerfile: Dockerfile
       target: run-app
+    environment:
+      - SERVER_PORT=80
     ports:
-      - "8080:8080"
+      - "80:80"
   e2e:
     container_name: e2e
     build:
@@ -15,9 +17,9 @@ services:
       dockerfile: Dockerfile
       target: run-e2e
     environment:
-      - WEB_HOST=http://web:8080
+      - WEB_HOST=http://web:80
     depends_on: ["web"]
-    entrypoint: ["./src/scripts/wait-for-it.sh", "-s", "web:8080", "--", "./src/scripts/run-all-tests-docker.sh"]
+    entrypoint: ["./src/scripts/wait-for-it.sh", "-s", "web:80", "--", "./src/scripts/run-all-tests-docker.sh"]
 
 networks:
   default:
