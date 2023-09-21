@@ -3,5 +3,5 @@
 *.tfstate.*
 
 # Local .terraform directories
-.terraform
+base_environment/.terraform
 log

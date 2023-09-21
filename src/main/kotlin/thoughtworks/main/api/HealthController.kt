@@ -3,14 +3,16 @@ package thoughtworks.main.api
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
+
 @RestController
-class HealthController {
+class HealthController{
+
     @GetMapping("/health")
-    fun healthy(): Status {
-        return Status("Healthy")
+    fun healthy(): Data {
+        return Data("Healthy")
     }
 }
 
-data class Status(
-    val status: String
+data class Data(
+    val data: String
 )

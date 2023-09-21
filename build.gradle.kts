@@ -19,9 +19,11 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    implementation("org.springframework.boot:spring-boot-starter-web:3.0.4")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.20-RC")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.7.2")
+    testImplementation("org.springframework.boot:spring-boot-starter-test:3.1.0")
 }
 
 tasks.withType<KotlinCompile> {

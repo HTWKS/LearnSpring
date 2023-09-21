@@ -16,11 +16,11 @@ build_and_push_docker_image(){
 }
 
 BASEDIR=$(dirname "$0")
-source "${BASEDIR}"/set-aws-environment.sh
+source "${BASEDIR}"/config.sh
 
-pushd "${BASEDIR}"/../
+pushd "${BASEDIR}"/../base_environment
 apply_terraform_and_set_variables
-pushd ../
+pushd ../../
 build_and_push_docker_image
 popd
 popd
