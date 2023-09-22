@@ -1,8 +1,6 @@
-package thoughtworks.unit.api
+package thoughtworks.main.api
 
 import org.junit.jupiter.api.Test
-import thoughtworks.main.api.Data
-import thoughtworks.main.api.HealthController
 
 class HealthControllerTests {
     @Test

@@ -1,0 +1,14 @@
+query getPullRequestTimeToLive($owner: String!, $name:String!) {
+    repository(owner: $owner, name: $name) {
+        pullRequests(first: 100) {
+            nodes {
+                createdAt
+                closedAt
+            }
+            pageInfo {
+                hasNextPage
+                endCursor
+            }
+        }
+    }
+}
