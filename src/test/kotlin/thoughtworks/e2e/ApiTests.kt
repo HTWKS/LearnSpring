@@ -8,7 +8,6 @@ import java.net.URI
 
 class ApiTests {
     @Test
-    @Disabled("Should only run in e2e environment")
     fun shouldReturnHealthy_WhenHealthyEndPointIsCalled() {
         val restTemplate = RestTemplate()
         val uriString = System.getenv("WEB_HOST") ?: "http://localhost:8080"
