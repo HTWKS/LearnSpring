@@ -2,10 +2,10 @@ package thoughtworks.main.api
 
 import org.junit.jupiter.api.Test
 
-class HealthControllerTests {
+class ControllersTests {
     @Test
     fun shouldReturnHealthy_WhenHealthyIsCalled() {
-        val sut = HealthController()
+        val sut = Controllers(GitHubGraphQlProcessor(SecretProperty("token")))
         assert(Data("Healthy") == sut.healthy())
     }
 }

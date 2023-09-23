@@ -1,6 +1,6 @@
-query getPullRequestTimeToLive($owner: String!, $name:String!) {
+query oneHundredPullRequestBatch($owner: String!, $name:String!, $after:String) {
     repository(owner: $owner, name: $name) {
-        pullRequests(first: 100) {
+        pullRequests(first: 100, after: $after) {
             nodes {
                 createdAt
                 closedAt

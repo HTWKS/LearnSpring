@@ -2,6 +2,7 @@ FROM gradle:8.2.1-jdk17 as gradle-cache
 RUN mkdir -p /home/gradle/cache_home
 ENV GRADLE_USER_HOME /home/gradle/cache_home
 COPY build.gradle.kts /home/gradle/java-code/
+COPY src/main/graphql /home/gradle/java-code/src/main/graphql
 WORKDIR /home/gradle/java-code
 RUN gradle clean build -i --stacktrace -x bootJar
 
