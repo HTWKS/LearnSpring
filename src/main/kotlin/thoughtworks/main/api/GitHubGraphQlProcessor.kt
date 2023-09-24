@@ -5,13 +5,12 @@ import com.apollographql.apollo3.api.Optional
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import thoughtworks.main.graphql.OneHundredPullRequestBatchQuery
-import thoughtworks.main.graphql.OneHundredPullRequestBatchQuery.Node
 import thoughtworks.main.graphql.OneHundredPullRequestBatchQuery.PullRequests
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Component
-class GitHubGraphQlProcessor(@Autowired private val property: SecretProperty) {
+class GitHubGraphQlProcessor(@Autowired property: SecretProperty) {
 
     private val _apolloClient: ApolloClient = apolloClient(property)
 
@@ -26,17 +25,13 @@ class GitHubGraphQlProcessor(@Autowired private val property: SecretProperty) {
 
 
     suspend fun getAllPullRequests(owner: String, repositoryName: String): List<GitHubPullRequest> {
-        var currentResponse = firstPage(owner, repositoryName)
-        if (currentResponse.shouldTakeNodes()) {
-            val pullRequests = currentResponse.toGitHubPullRequests().toMutableList()
-            while (currentResponse!!.shouldContinueFetching()) {
-                val nextPage = currentResponse.nextPage(owner, repositoryName)
-                pullRequests.addAll(nextPage.toGitHubPullRequests())
-                currentResponse = nextPage
-            }
-            return pullRequests
+        var response = firstPage(owner, repositoryName)
+        val allPullRequests = response.toGitHubPullRequests().toMutableList()
+        while (response.shouldContinueFetching()) {
+            response = response!!.nextPage(owner, repositoryName)
+            allPullRequests.addAll(response.toGitHubPullRequests())
         }
-        return emptyList()
+        return allPullRequests
     }
 
     fun setFetch(fetch: suspend (owner: String, repositoryName: String, after: Optional<String?>) -> PullRequests?) {
@@ -50,22 +45,21 @@ class GitHubGraphQlProcessor(@Autowired private val property: SecretProperty) {
         _fetch(owner, repositoryName, Optional.present(this.pageInfo.endCursor!!))
 
     private fun PullRequests?.toGitHubPullRequests(): List<GitHubPullRequest> {
-        if (this.shouldTakeNodes()) return this!!.nodes!!.toGitHubPullRequests()
-        return emptyList()
+        if (this?.nodes == null) {
+            return emptyList()
+        }
+        return this.nodes.map {
+            GitHubPullRequest(
+                it?.createdAt.toString().toLocalDateTime(),
+                it?.closedAt?.toString()?.toLocalDateTime()
+            )
+        }
     }
 
-    private fun List<Node?>.toGitHubPullRequests(): List<GitHubPullRequest> = this.map {
-        GitHubPullRequest(
-            it?.createdAt.toString().toLocalDateTime(),
-            it?.closedAt?.toString()?.toLocalDateTime()
-        )
-    }
-
-    private fun PullRequests.shouldContinueFetching() =
-        this.pageInfo.hasNextPage && (this.pageInfo.endCursor != null)
-
-    private fun PullRequests?.shouldTakeNodes() = this?.nodes != null
+    private fun PullRequests?.shouldContinueFetching() =
+        this != null && this.pageInfo.hasNextPage && this.pageInfo.endCursor != null
 }
+
 
 const val GITHUB_GRAPHQL_ENDPOINT = "https://api.github.com/graphql"
 
