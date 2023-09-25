@@ -1,3 +1,4 @@
+# After trial on https://docs.github.com/en/graphql/overview/explorer, I found that 100 is the repository query rate limit
 query oneHundredPullRequestBatch($owner: String!, $name:String!, $after:String) {
     repository(owner: $owner, name: $name) {
         pullRequests(first: 100, after: $after) {
