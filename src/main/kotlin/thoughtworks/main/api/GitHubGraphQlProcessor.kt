@@ -9,19 +9,15 @@ import thoughtworks.main.graphql.OneHundredPullRequestBatchQuery.PullRequests
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+typealias FetchFromGithub = suspend (owner: String, repositoryName: String, after: Optional<String?>) -> PullRequests?
+
 @Component
 class GitHubGraphQlProcessor(@Autowired property: SecretProperty) {
 
+
     private val _apolloClient: ApolloClient = apolloClient(property)
 
-    private var _fetch: suspend (owner: String, repositoryName: String, after: Optional<String?>) -> PullRequests? =
-        { owner: String,
-          repositoryName: String,
-          after: Optional<String?> ->
-            _apolloClient.query(OneHundredPullRequestBatchQuery(owner, repositoryName, after))
-                .execute()
-                .data?.repository?.pullRequests
-        }
+    private var _fetch: FetchFromGithub = ::defaultFetchFromGithub
 
 
     suspend fun getAllPullRequests(owner: String, repositoryName: String): List<GitHubPullRequest> {
@@ -34,9 +30,16 @@ class GitHubGraphQlProcessor(@Autowired property: SecretProperty) {
         return allPullRequests
     }
 
-    fun setFetch(fetch: suspend (owner: String, repositoryName: String, after: Optional<String?>) -> PullRequests?) {
+    fun setFetch(fetch: FetchFromGithub) {
         _fetch = fetch
     }
+
+    private suspend fun defaultFetchFromGithub(owner: String,
+                                               repositoryName: String,
+                                               after: Optional<String?>): PullRequests? =
+        _apolloClient.query(OneHundredPullRequestBatchQuery(owner, repositoryName, after))
+            .execute()
+            .data?.repository?.pullRequests
 
     private suspend fun firstPage(owner: String, repositoryName: String): PullRequests? =
         _fetch(owner, repositoryName, Optional.Absent)
