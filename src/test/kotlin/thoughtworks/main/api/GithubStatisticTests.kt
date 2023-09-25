@@ -15,7 +15,7 @@ class GithubStatisticTests {
         val expected = Duration.ofHours(hour)
 
         val gitHubPullRequests = listOf(GitHubPullRequest(createdAt, closedAt))
-        val actual = gitHubPullRequests.averagePullRequestDuration()
+        val actual = gitHubPullRequests.averageDuration()
 
         assert(expected == actual) { "Expected: ${expected.seconds}, Actual: ${actual.seconds}" }
     }
@@ -31,7 +31,7 @@ class GithubStatisticTests {
             GitHubPullRequest(baseTime, plusOneHour),
             GitHubPullRequest(baseTime, plusTwoHour)
         )
-        val actual = gitHubPullRequests.averagePullRequestDuration()
+        val actual = gitHubPullRequests.averageDuration()
 
         assert(expected == actual) { "Expected: ${expected.seconds}, Actual: ${actual.seconds}" }
     }
@@ -43,7 +43,7 @@ class GithubStatisticTests {
         val expected = Duration.ofHours(1)
         val gitHubPullRequests = listOf(GitHubPullRequest(baseTime, null))
 
-        val actual = gitHubPullRequests.averagePullRequestDuration(localDateTimeNow = plusOneHour)
+        val actual = gitHubPullRequests.averageDuration(localDateTimeNow = plusOneHour)
         assert(expected == actual) { "Expected: ${expected.seconds}, Actual: ${actual.seconds}" }
     }
 }

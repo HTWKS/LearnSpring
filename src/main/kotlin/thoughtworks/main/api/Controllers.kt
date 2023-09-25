@@ -23,7 +23,10 @@ class Controllers(@Autowired private val gitHubGraphQlProcessor: GitHubGraphQlPr
         @PathVariable repositoryName: String
     ): Data {
         return Data(
-            gitHubGraphQlProcessor.getAllPullRequests(owner, repositoryName).averagePullRequestDuration().toHumanReadableString()
+            gitHubGraphQlProcessor
+                .getAllPullRequests(owner, repositoryName)
+                .averageDuration()
+                .toHumanReadableString()
         )
     }
 }

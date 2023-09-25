@@ -15,7 +15,7 @@ typealias FetchFromGithub = suspend (owner: String, repositoryName: String, afte
 class GitHubGraphQlProcessor(@Autowired property: SecretProperty) {
 
 
-    private val _apolloClient: ApolloClient = apolloClient(property)
+    private val _apolloClient = apolloClient(property)
 
     private var _fetch: FetchFromGithub = ::defaultFetchFromGithub
 
