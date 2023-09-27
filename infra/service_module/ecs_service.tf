@@ -35,5 +35,6 @@ resource "aws_security_group" "service" {
     from_port        = var.container_port
     to_port          = var.container_port
     cidr_blocks      = ["0.0.0.0/0"] // TODO: ALB instead?
+    ipv6_cidr_blocks = ["::/0"]      // TODO: necessary?
   }
 }

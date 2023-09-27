@@ -1,9 +1,10 @@
-package thoughtworks.main.api
+package thoughtworks.main.infra
 
 import com.apollographql.apollo3.ApolloClient
 import com.apollographql.apollo3.api.Optional
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import thoughtworks.main.core.GitHubPullRequest
 import thoughtworks.main.graphql.OneHundredPullRequestBatchQuery
 import thoughtworks.main.graphql.OneHundredPullRequestBatchQuery.PullRequests
 import java.time.LocalDateTime
@@ -11,16 +12,18 @@ import java.time.format.DateTimeFormatter
 
 typealias FetchFromGithub = suspend (owner: String, repositoryName: String, after: Optional<String?>) -> PullRequests?
 
-@Component
-class GitHubGraphQlProcessor(@Autowired property: SecretProperty) {
+interface GithubQuery {
+    suspend fun getAllPullRequests(owner: String, repositoryName: String): List<GitHubPullRequest>
+}
 
+@Component
+class GitHubGraphQlProcessor(@Autowired property: SecretProperty) : GithubQuery {
 
     private val _apolloClient = apolloClient(property)
 
     private var _fetch: FetchFromGithub = ::defaultFetchFromGithub
 
-
-    suspend fun getAllPullRequests(owner: String, repositoryName: String): List<GitHubPullRequest> {
+    override suspend fun getAllPullRequests(owner: String, repositoryName: String): List<GitHubPullRequest> {
         var response = firstPage(owner, repositoryName)
         val allPullRequests = response.toGitHubPullRequests().toMutableList()
         while (response.shouldContinueFetching()) {
@@ -34,9 +37,11 @@ class GitHubGraphQlProcessor(@Autowired property: SecretProperty) {
         _fetch = fetch
     }
 
-    private suspend fun defaultFetchFromGithub(owner: String,
-                                               repositoryName: String,
-                                               after: Optional<String?>): PullRequests? =
+    private suspend fun defaultFetchFromGithub(
+        owner: String,
+        repositoryName: String,
+        after: Optional<String?>
+    ): PullRequests? =
         _apolloClient.query(OneHundredPullRequestBatchQuery(owner, repositoryName, after))
             .execute()
             .data?.repository?.pullRequests
@@ -51,12 +56,14 @@ class GitHubGraphQlProcessor(@Autowired property: SecretProperty) {
         if (this?.nodes == null) {
             return emptyList()
         }
-        return this.nodes.map {
-            GitHubPullRequest(
-                it?.createdAt.toString().toLocalDateTime(),
-                it?.closedAt?.toString()?.toLocalDateTime()
-            )
-        }
+        return this.nodes
+            .filterNotNull()
+            .map {
+                GitHubPullRequest(
+                    it.createdAt.toString().toLocalDateTime(),
+                    it.closedAt?.toString()?.toLocalDateTime()
+                )
+            }
     }
 
     private fun PullRequests?.shouldContinueFetching() =

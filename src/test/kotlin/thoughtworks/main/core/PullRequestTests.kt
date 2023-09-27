@@ -1,4 +1,4 @@
-package thoughtworks.main.api
+package thoughtworks.main.core
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -6,7 +6,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import java.time.Duration
 import java.time.LocalDateTime
 
-class GithubStatisticTests {
+class PullRequestTests {
     @ParameterizedTest
     @ValueSource(longs = [1, 2])
     fun `should calculate average of one pull request correctly`(hour: Long) {

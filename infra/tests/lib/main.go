@@ -12,7 +12,7 @@ const projectRootDir = "../../"
 func CreateAllBaseEnvironmentsAndConfirmAlbIsReachable(t *testing.T, terraformWorkspaceName string) {
 	RunScriptWithoutArgs(t, "scripts/infra-setup/create-all-base-environments.sh")
 
-	albBaseUrl := GetTerraformOutput(t, terraformWorkspaceName, "infra/base_environment", "alb_base_url")
+	albBaseUrl := GetTerraformOutput(t, terraformWorkspaceName, "base_environment", "alb_base_url")
 
 	http_helper.HttpGetWithRetryWithCustomValidation(t, albBaseUrl, nil, 12, 5*time.Second, func(statusCode int, body string) bool {
 		return statusCode == 200

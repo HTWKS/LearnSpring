@@ -12,6 +12,6 @@ module "some_service" {
   path_pattern      = "/some_service/*"
   service_name      = "${terraform.workspace}-some-service"
   container_port    = 80
-  container_image   = "nginx:latest"
+  container_image   = "nginx:stable"
 }
 

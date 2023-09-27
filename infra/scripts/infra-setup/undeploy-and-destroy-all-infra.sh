@@ -7,7 +7,7 @@ SCRIPTS_DIR="${BASEDIR}/.."
 source "${SCRIPTS_DIR}"/config.sh
 source "${SCRIPTS_DIR}"/shared.sh
 
-question "You're about to DELETE ALL environments for Launch batch '${BATCH_NUMBER}'"
+question "You're about to DELETE ALL environments"
 for ENVIRONMENT in ${ENVIRONMENTS}; do
 	echo "  - ${ENVIRONMENT}"
 done

@@ -4,6 +4,8 @@ import com.apollographql.apollo3.api.Optional
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import thoughtworks.main.graphql.OneHundredPullRequestBatchQuery
+import thoughtworks.main.infra.GitHubGraphQlProcessor
+import thoughtworks.main.infra.SecretProperty
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -11,6 +13,19 @@ import java.time.LocalTime
 class GithubRepositoryTests {
     private val owner = "owner"
     private val repositoryName = "repositoryName"
+    @Test
+    fun `Should get empty pull requests successfully when node has null pull request`() = runBlocking {
+        val repository = GitHubGraphQlProcessor(SecretProperty(""))
+        repository.setFetch { _, _, _ ->
+            OneHundredPullRequestBatchQuery.PullRequests(
+                nodes = listOf(null),
+                pageInfo = OneHundredPullRequestBatchQuery.PageInfo(hasNextPage = false, endCursor = null)
+            )
+        }
+        val allPullRequests = repository.getAllPullRequests(owner, repositoryName)
+        assert(allPullRequests.isEmpty())
+    }
+
     @Test
     fun `Should get empty pull requests successfully`() = runBlocking {
         val repository = GitHubGraphQlProcessor(SecretProperty(""))

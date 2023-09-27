@@ -1,13 +1,18 @@
-package thoughtworks.main.api
+package thoughtworks.main.core
 
 import java.time.Duration
 import java.time.LocalDateTime
 
-data class GitHubPullRequest(val createdAt: LocalDateTime, val closedAt: LocalDateTime?)
+data class GitHubPullRequest(val createdAt: LocalDateTime, val closedAt: LocalDateTime?) {
+    fun duration(timeNow : LocalDateTime): Duration = when(closedAt == null) {
+        true -> Duration.between(createdAt, timeNow)
+        false -> Duration.between(createdAt, closedAt)
+    }
+}
 
 fun List<GitHubPullRequest>.averageDuration(localDateTimeNow: LocalDateTime = LocalDateTime.now()): Duration {
     val count = count().toLong()
-    return map { Duration.between(it.createdAt, it.closedAt ?: localDateTimeNow) }
+    return map { it.duration(localDateTimeNow) }
         .fold(Duration.ZERO) { acc, current -> acc + current.dividedBy(count) }
 }
 

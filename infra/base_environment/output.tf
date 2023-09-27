@@ -1,11 +1,3 @@
-output "ecr_public_repository_uri" {
-  value = aws_ecrpublic_repository.ecr_repository.repository_uri
-}
-
-output "ecr_public_repository_name" {
-  value = aws_ecrpublic_repository.ecr_repository.repository_name
-}
-
 output "alb_base_url" {
   value = "https://${local.host}"
 }

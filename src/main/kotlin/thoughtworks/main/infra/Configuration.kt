@@ -1,4 +1,4 @@
-package thoughtworks.main.api
+package thoughtworks.main.infra
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Configuration

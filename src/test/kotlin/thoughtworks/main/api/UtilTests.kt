@@ -3,6 +3,8 @@ package thoughtworks.main.api
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
+import thoughtworks.main.core.toHumanReadableString
+import thoughtworks.main.infra.toLocalDateTime
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -18,7 +20,7 @@ class UtilTests {
     }
 
     @ParameterizedTest
-    @CsvSource(value = ["2,2s", "600,10m", "3600,1h", "5400,1h30m", "172800,48h"])
+    @CsvSource(value = ["2,2s", "600,10m", "3600,1h", "5400,1h30m", "172800,48h", "172850,48h50s"])
     fun `Should convert time duration to human readable form`(durationInSecond: Long, expected: String) {
         val testData = Duration.ofSeconds(durationInSecond)
         val actual = testData.toHumanReadableString()

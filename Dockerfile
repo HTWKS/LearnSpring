@@ -10,7 +10,7 @@ FROM gradle:8.2.1-jdk17 as app-artifact-cache
 COPY --from=gradle-cache /home/gradle/cache_home /home/gradle/.gradle
 COPY . /usr/src/java-code/
 WORKDIR /usr/src/java-code
-RUN gradle bootJar -i --stacktrace
+RUN gradle assemble -i --stacktrace
 
 FROM eclipse-temurin:17-jdk as run-app
 USER root

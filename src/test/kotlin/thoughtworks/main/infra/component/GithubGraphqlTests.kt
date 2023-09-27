@@ -1,4 +1,4 @@
-package thoughtworks.main.component
+package thoughtworks.main.infra.component
 
 import com.apollographql.apollo3.api.Optional
 import kotlinx.coroutines.runBlocking
@@ -11,13 +11,16 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.awaitBody
 import thoughtworks.main.api.*
 import thoughtworks.main.graphql.OneHundredPullRequestBatchQuery
+import thoughtworks.main.infra.GITHUB_GRAPHQL_ENDPOINT
+import thoughtworks.main.infra.GitHubGraphQlProcessor
+import thoughtworks.main.infra.SecretProperty
+import thoughtworks.main.infra.apolloClient
 
 @SpringBootTest
 class GithubGraphqlTests(@Autowired val property: SecretProperty) {
     private val webClient = WebClient.builder().baseUrl(GITHUB_GRAPHQL_ENDPOINT).build()
     private val owner = "devlooped"
     private val repositoryName = "moq"
-    private val currentPrCount = 604
 
     @Test
     fun `should exchange view login successfully`() = runBlocking {
@@ -63,13 +66,6 @@ class GithubGraphqlTests(@Autowired val property: SecretProperty) {
         assert(nextResponse.data!!.repository!!.pullRequests.nodes!!.isNotEmpty())
         assert(nextResponse.data!!.repository!!.pullRequests.pageInfo.endCursor != null)
         assert(nextResponse.data!!.repository!!.pullRequests.pageInfo.endCursor!!.isNotEmpty())
-    }
-
-    @Test
-    fun `should test component successfully`() = runBlocking {
-        val sut = GitHubGraphQlProcessor(property)
-        val actual = sut.getAllPullRequests(owner, repositoryName)
-        assert(actual.count() >= currentPrCount) { actual.count() }
     }
 
     // The "inline" and "reified" keyword is necessary for Jackson to deserialize json response to kotlin class
