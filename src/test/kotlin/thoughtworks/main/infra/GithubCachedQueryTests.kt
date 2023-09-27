@@ -13,6 +13,7 @@ import java.time.LocalDateTime
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.Semaphore
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.system.measureTimeMillis
 
 @SpringBootTest
@@ -43,7 +44,8 @@ class GithubCachedQueryTests(@Autowired private val sut: GithubCachedQuery) {
 
     val owner = UUID.randomUUID().toString()
     val name = UUID.randomUUID().toString()
-    companion object{
+
+    companion object {
         const val NET_WORK_CALL_TIME_MILLIS = 50L
     }
 
@@ -106,11 +108,11 @@ class GithubCachedQueryTests(@Autowired private val sut: GithubCachedQuery) {
     }
 
     @Test
-    fun `should cache successfully in race condition`() = runBlocking {
+    fun `should call factory function only once in race condition`() = runBlocking {
         val mock = GithubSuspendedQueryMockAllowToBeCalledOnce()
         sut.githubQuery = mock
         simulateRaceCondition(10) { sut.getAllPullRequests(owner, name).await() }
-        assert(mock.called) { mock.called }
+        assert(mock.callCount() == 1) { mock.callCount() }
     }
 
     class NonThreadSafeSetter {
@@ -138,15 +140,13 @@ class GithubCachedQueryTests(@Autowired private val sut: GithubCachedQuery) {
     }
 
     class GithubSuspendedQueryMockAllowToBeCalledOnce : GithubQuery {
-        var called = false
+        private val callCount = AtomicInteger()
         override suspend fun getAllPullRequests(owner: String, repositoryName: String): List<GitHubPullRequest> {
-            if (called) {
-                throw Exception("Should not be called twice")
-            }
             delay(NET_WORK_CALL_TIME_MILLIS)
-            called = true
+            callCount.incrementAndGet()
             return emptyList()
         }
+        fun callCount() = callCount.get()
     }
 
     private suspend fun simulateRaceCondition(concurrency: Int, action: suspend () -> Unit) {
